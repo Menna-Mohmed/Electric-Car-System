@@ -1,0 +1,95 @@
+#include <LiquidCrystal.h>
+
+#define WindowPot A5 
+#define flButtonPin 7
+#define frButtonPin 6
+#define rlButtonPin 5
+#define rrButtonPin 4
+#define ToggleMode A0
+
+bool fl_door = false;
+bool fr_door = false;
+bool rl_door = false;
+bool rr_door = false;
+bool Mode = false;
+
+const int rs = 13, en = 12, d4 = 11, d5 = 10, d6 = 9, d7 = 8;
+
+int WindowRead = 0 ;
+
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7); 
+
+void Doors(void);
+void Window(void);
+
+void setup()
+{
+  lcd.begin(16, 2);
+
+  
+  pinMode(frButtonPin, INPUT_PULLUP);
+  pinMode(flButtonPin, INPUT_PULLUP);
+  pinMode(rlButtonPin, INPUT_PULLUP);
+  pinMode(rrButtonPin, INPUT_PULLUP);
+  pinMode(ToggleMode,INPUT_PULLUP);
+
+  pinMode(WindowPot,INPUT);
+}
+
+void loop()
+{
+  if(!digitalRead(ToggleMode))
+  {
+    Mode ^= 1;
+    delay(200);
+    lcd.clear();
+  }  
+  if (!Mode)
+  {
+    Doors();   
+  }
+  else
+  {
+    Window();
+  }
+
+}
+
+void Doors(void)
+{
+  fl_door = digitalRead(flButtonPin) == LOW;
+  fr_door = digitalRead(frButtonPin) == LOW;
+  rl_door = digitalRead(rlButtonPin) == LOW;
+  rr_door = digitalRead(rrButtonPin) == LOW;
+
+  lcd.setCursor(0, 0);
+  lcd.print("FL:");
+  lcd.print(fl_door ? "Open" : "Shut");
+
+  lcd.setCursor(7, 0);
+  lcd.print("_FR:");
+  lcd.print(fr_door ? "Open" : "Shut");
+
+  lcd.setCursor(0, 1);
+  lcd.print("RL:");
+  lcd.print(rl_door ? "Open" : "Shut");
+
+  lcd.setCursor(7, 1);
+  lcd.print("_RR:");
+  lcd.print(rr_door ? "Open" : "Shut");
+
+}
+
+void Window(void)
+{
+  WindowRead = analogRead(WindowPot);
+  int Percentage = map(WindowRead , 0 , 1024 , 0 , 101);
+  lcd.setCursor(4,0);
+  lcd.print("Window :");
+  lcd.setCursor(4,1);
+  lcd.print("%");
+  lcd.print(Percentage);
+  lcd.print(" shut");
+  lcd.print("  ");
+  
+}
